@@ -19,7 +19,11 @@ class TogglBaseApi
   end
 
   def self.toggl_file
-     '.toggl'
+    '.toggl'
+  end
+
+  def user_agent
+    'api'
   end
 
   def initialize(username=nil, password=self.class.api_token, opts={})
@@ -96,13 +100,13 @@ private
     full_resp
   end
 
-  def get(resource)
+  def get(resource, full_response=false)
     resource.gsub!('+', '%2B')
     full_resp = _call_api(debug_output: lambda { "GET #{resource}" },
                           api_call: lambda { self.conn.get(resource) } )
     return {} if full_resp == {}
     resp = Oj.load(full_resp.body)
-    return resp['data'] if resp.respond_to?(:has_key?) && resp.has_key?('data')
+    return resp['data'] if resp.respond_to?(:has_key?) && resp.has_key?('data') && !full_response
     resp
   end
 
